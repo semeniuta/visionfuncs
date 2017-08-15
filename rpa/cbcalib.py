@@ -118,6 +118,21 @@ def get_im_wh(im):
     h, w = im.shape
     return w, h
 
+
+def undistort_and_rectify_images_stereo(images1, images2, cm1, dc1, cm2, dc2, R1, R2, P1, P2):
+
+    im_wh = get_im_wh(images1[0])
+
+    maps1 = cv2.initUndistortRectifyMap(cm1, dc1, R1, P1, im_wh, m1type=cv2.CV_16SC2)
+    maps2 = cv2.initUndistortRectifyMap(cm2, dc2, R2, P2, im_wh, m1type=cv2.CV_16SC2)
+
+    interp_method = cv2.INTER_LINEAR
+
+    images1_rect = [cv2.remap(im, maps1[0], maps1[1], interp_method) for im in images1]
+    images2_rect = [cv2.remap(im, maps2[0], maps2[1], interp_method) for im in images2]
+
+    return images1_rect, images2_rect, maps1, maps2
+
 class CGFindCorners(compgraph.CompGraph):
 
     def __init__(self):
