@@ -3,12 +3,9 @@
 import numpy as np
 import PIL
 
-def open_image(image_file, gray=True):
-    ''' 
-    Opens image file specified as a string
-    '''
+def open_image(filename, gray=True):
 
-    im = PIL.Image.open(image_file)
+    im = PIL.Image.open(filename)
     if gray:
         im = im.convert('L')
     return np.array(im)
