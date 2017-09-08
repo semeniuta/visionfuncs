@@ -27,13 +27,6 @@ def find_cbc(img, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
 
     return res
 
-#def find_cbc_in_images(images, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
-#
-#    def fnd(im):
-#        return find_cbc(im, pattern_size_wh, searchwin_size, findcbc_flags)
-#
-#    return [cbc_opencv_to_numpy(*fnd(im)) for im in images]
-
 
 def cbc_opencv_to_numpy(success, cbc_res):
     '''

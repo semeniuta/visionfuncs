@@ -13,6 +13,11 @@ METHOD_INIT = {
     'orb': cv2.ORB_create
 }
 
+
+def create_kvargs_dict_if_not_none(param_names, param_vals):
+    return {p_name: p_val for p_name, p_val in zip(param_names, param_vals) if p_val != None}
+
+
 def create_concrete_feature_cg(method):
 
     if method not in METHOD_PARAMS:
@@ -24,7 +29,7 @@ def create_concrete_feature_cg(method):
     def func(*args):
 
         im, mask = args[:2]
-        kvargs = {p_name: p_val for p_name, p_val in zip(param_names, args[2:]) if p_val != None}
+        kvargs = create_kvargs_dict_if_not_none(param_names, args[2:])
 
         fd = method_create(**kvargs)
 
