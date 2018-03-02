@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from epypes import compgraph
 
-flags = {
+findcbc_flags = {
     'default': cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_NORMALIZE_IMAGE,
     'at_or_fq': cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_FILTER_QUADS
 }
@@ -108,7 +108,7 @@ def rvec_to_rmat(rvec):
     return rmat
 
 def get_im_wh(im):
-    h, w = im.shape
+    h, w = im.shape[:2]
     return w, h
 
 
@@ -208,4 +208,3 @@ class CGCalibrateStereo(compgraph.CompGraph):
         }
 
         super(CGCalibrateStereo, self).__init__(func_dict, func_io)
-
