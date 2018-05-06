@@ -30,7 +30,6 @@ def find_cbc(im, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
 
 def cbc_opencv_to_numpy(success, cbc_res):
     """
-    TODO Phase out this function
     Transform the result of OpenCV's chessboard corners detection
     to a numpy array of size (n_corners x 2). If corners were not
     identified correctly, the function returns None
@@ -42,24 +41,39 @@ def cbc_opencv_to_numpy(success, cbc_res):
         return None
 
 
-def reformat_corners(corners_opencv):
-    return corners_opencv.reshape(-1, 2)
-
-
 def prepare_corners(images, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
+    """
+    Find chessboard corners in the supplied images.
+
+    Returns `corners_list`, a list containing NumPy arrays (n_corners x 2) for images with successful
+    corners detection and None for the unsuccessful ones
+    """
 
     corners_list = []
-    successes = np.zeros(len(images), dtype=np.int)
 
     for i, im in enumerate(images):
 
         found, corners = find_cbc(im, pattern_size_wh, searchwin_size, findcbc_flags)
+        corners_list.append(cbc_opencv_to_numpy(found, corners))
 
-        if found:
-            corners_list.append(reformat_corners(corners))
-            successes[i] = 1
+    return corners_list
 
-    return corners_list, successes
+
+def prepare_corners_stereo(images1, images2, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
+
+    corners1 = prepare_corners(images1, pattern_size_wh, searchwin_size, findcbc_flags)
+    corners2 = prepare_corners(images2, pattern_size_wh, searchwin_size, findcbc_flags)
+
+    res1 = []
+    res2 = []
+    for c1, c2 in zip(corners1, corners2):
+        if not ((c1 is None) or (c2 is None)):
+            res1.append(c1)
+            res2.append(c2)
+
+    num_images = len(res1)
+
+    return res1, res2, num_images
 
 
 def calibrate_camera(im_wh, object_points, image_points):
@@ -153,28 +167,12 @@ def undistort_and_rectify_images_stereo(images1, images2, cm1, dc1, cm2, dc2, R1
     return images1_rect, images2_rect, maps1, maps2
 
 
-class CGFindCorners(compgraph.CompGraph):
-
-    def __init__(self):
-
-        func_dict = {
-            'find_corners': find_cbc,
-            'reformat_corners': cbc_opencv_to_numpy
-        }
-
-        func_io = {
-            'find_corners': (('image', 'pattern_size_wh'), ('success', 'corners_opencv')),
-            'reformat_corners': (('success', 'corners_opencv'), 'corners_np')
-        }
-
-        super(CGFindCorners, self).__init__(func_dict, func_io)
-
 class CGCalibrateCamera(compgraph.CompGraph):
 
     def __init__(self):
 
         func_dict = {
-            'prepare_corners': compgraph.FunctionPlaceholder(),
+            'prepare_corners': prepare_corners,
             'count_images': lambda lst: len(lst),
             'prepare_object_points': prepare_object_points,
             'calibrate_camera': calibrate_camera
@@ -213,7 +211,7 @@ class CGCalibrateStereo(compgraph.CompGraph):
     def __init__(self):
 
         func_dict = {
-            'prepare_corners': compgraph.FunctionPlaceholder(),
+            'prepare_corners': prepare_corners_stereo,
             'prepare_object_points': prepare_object_points,
             'calibrate_camera_1': calibrate_camera,
             'calibrate_camera_2': calibrate_camera,
