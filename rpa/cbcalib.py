@@ -10,9 +10,9 @@ findcbc_flags = {
 }
 
 def find_cbc(im, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
-    '''
+    """
     Find chessboard corners in the given image using OpenCV
-    '''
+    """
 
     if findcbc_flags == None:
         res = cv2.findChessboardCorners(im, pattern_size_wh)
@@ -29,12 +29,12 @@ def find_cbc(im, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
 
 
 def cbc_opencv_to_numpy(success, cbc_res):
-    '''
+    """
     TODO Phase out this function
     Transform the result of OpenCV's chessboard corners detection
     to a numpy array of size (n_corners x 2). If corners were not
     identified correctly, the function returns None
-    '''
+    """
 
     if success:
         return cbc_res.reshape(-1, 2)
@@ -63,7 +63,7 @@ def prepare_corners(images, pattern_size_wh, searchwin_size=5, findcbc_flags=Non
 
 
 def calibrate_camera(im_wh, object_points, image_points):
-    '''
+    """
     Perform camera calibration using a set of images with the chessboard pattern
 
     image_points -- a list of chessboard corners shaped as NumPy arrays (n_points x 2)
@@ -71,7 +71,7 @@ def calibrate_camera(im_wh, object_points, image_points):
     Returns a tuple as a result of the cv2.calibrateCamera function call,
     containing the following calibration results:
     rms, camera_matrix, dist_coefs, rvecs, tvecs
-    '''
+    """
 
     res = cv2.calibrateCamera(object_points, image_points, im_wh, None, None)
     return res
@@ -101,9 +101,9 @@ def triangulate_points(P1, P2, points1, points2):
 
 
 def prepare_object_points(num_images, pattern_size_wh, square_size):
-    '''
+    """
     Prepare a list of object points matrices
-    '''
+    """
 
     pattern_points = get_pattern_points(pattern_size_wh, square_size)
     object_points = [pattern_points for i in range(num_images)]
@@ -111,9 +111,9 @@ def prepare_object_points(num_images, pattern_size_wh, square_size):
 
 
 def get_pattern_points(pattern_size_wh, square_size):
-    '''
+    """
     Form a matrix with object points for a chessboard calibration object
-    '''
+    """
 
     pattern_points = np.zeros((np.prod(pattern_size_wh), 3), np.float32)
     pattern_points[:, :2] = np.indices(pattern_size_wh).T.reshape(-1, 2)
