@@ -9,27 +9,28 @@ findcbc_flags = {
     'at_or_fq': cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_FILTER_QUADS
 }
 
-def find_cbc(img, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
+def find_cbc(im, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
     '''
     Find chessboard corners in the given image using OpenCV
     '''
 
     if findcbc_flags == None:
-        res = cv2.findChessboardCorners(img, pattern_size_wh)
+        res = cv2.findChessboardCorners(im, pattern_size_wh)
     else:
-        res = cv2.findChessboardCorners(img, pattern_size_wh, flags=findcbc_flags)
+        res = cv2.findChessboardCorners(im, pattern_size_wh, flags=findcbc_flags)
 
     found, corners = res
 
     if found:
         term = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_COUNT, 30, 0.1)
-        cv2.cornerSubPix(img, corners, (searchwin_size, searchwin_size), (-1, -1), term)
+        cv2.cornerSubPix(im, corners, (searchwin_size, searchwin_size), (-1, -1), term)
 
     return res
 
 
 def cbc_opencv_to_numpy(success, cbc_res):
     '''
+    TODO Phase out this function
     Transform the result of OpenCV's chessboard corners detection
     to a numpy array of size (n_corners x 2). If corners were not
     identified correctly, the function returns None
@@ -39,6 +40,26 @@ def cbc_opencv_to_numpy(success, cbc_res):
         return cbc_res.reshape(-1, 2)
     else:
         return None
+
+
+def reformat_corners(corners_opencv):
+    return corners_opencv.reshape(-1, 2)
+
+
+def prepare_corners(images, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
+
+    corners_list = []
+    successes = np.zeros(len(images), dtype=np.int)
+
+    for i, im in enumerate(images):
+
+        found, corners = find_cbc(im, pattern_size_wh, searchwin_size, findcbc_flags)
+
+        if found:
+            corners_list.append(reformat_corners(corners))
+            successes[i] = 1
+
+    return corners_list, successes
 
 
 def calibrate_camera(im_wh, object_points, image_points):
@@ -54,6 +75,7 @@ def calibrate_camera(im_wh, object_points, image_points):
 
     res = cv2.calibrateCamera(object_points, image_points, im_wh, None, None)
     return res
+
 
 def calibrate_stereo(object_points, impoints_1, impoints_2, cm_1, dc_1, cm_2, dc_2, im_wh):
 
@@ -77,6 +99,7 @@ def triangulate_points(P1, P2, points1, points2):
 
     return res
 
+
 def prepare_object_points(num_images, pattern_size_wh, square_size):
     '''
     Prepare a list of object points matrices
@@ -97,15 +120,18 @@ def get_pattern_points(pattern_size_wh, square_size):
     pattern_points *= square_size
     return pattern_points
 
+
 def solve_pnp_ransac(pattern_points, image_points, cam_matrix, dist_coefs,
                      use_extrinsic_guess=False, iter_count=100, reproj_err_threshold=8.0, confidence=0.99):
 
     return cv2.solvePnPRansac(pattern_points, image_points, cam_matrix, dist_coefs,
                               use_extrinsic_guess, iter_count, reproj_err_threshold, confidence)
 
+
 def rvec_to_rmat(rvec):
     rmat, _ = cv2.Rodrigues(rvec)
     return rmat
+
 
 def get_im_wh(im):
     h, w = im.shape[:2]
@@ -125,6 +151,7 @@ def undistort_and_rectify_images_stereo(images1, images2, cm1, dc1, cm2, dc2, R1
     images2_rect = [cv2.remap(im, maps2[0], maps2[1], interp_method) for im in images2]
 
     return images1_rect, images2_rect, maps1, maps2
+
 
 class CGFindCorners(compgraph.CompGraph):
 
