@@ -14,7 +14,7 @@ METHOD_INIT = {
 }
 
 
-def create_kvargs_dict_if_not_none(param_names, param_vals):
+def create_kwargs_dict_if_not_none(param_names, param_vals):
     return {p_name: p_val for p_name, p_val in zip(param_names, param_vals) if p_val != None}
 
 
@@ -29,7 +29,7 @@ def create_concrete_feature_cg(method):
     def func(*args):
 
         im, mask = args[:2]
-        kvargs = create_kvargs_dict_if_not_none(param_names, args[2:])
+        kvargs = create_kwargs_dict_if_not_none(param_names, args[2:])
 
         fd = method_create(**kvargs)
 
@@ -45,6 +45,7 @@ def create_concrete_feature_cg(method):
     cg = add_new_vertices(CGFeatures(), add_func_dict, add_func_io)
 
     return cg
+
 
 def create_feature_matching_cg(method):
 

@@ -188,6 +188,7 @@ class CGCalibrateCamera(compgraph.CompGraph):
 
         super(CGCalibrateCamera, self).__init__(func_dict, func_io)
 
+
 class CGSolvePnP(compgraph.CompGraph):
 
     def __init__(self):
@@ -205,6 +206,7 @@ class CGSolvePnP(compgraph.CompGraph):
         }
 
         super(CGSolvePnP, self).__init__(func_dict, func_io)
+
 
 class CGCalibrateStereo(compgraph.CompGraph):
 
