@@ -21,6 +21,13 @@ def open_image(fname, read_flag=cv2.IMREAD_COLOR, color_transform=None):
     return im
 
 
+def image_generator(imfiles, subsets, **open_image_kwargs):
+
+    for indices in subsets:
+        fnames = (imfiles[idx] for idx in indices)
+        yield [open_image(im_f, **open_image_kwargs) for im_f in fnames]
+
+
 def sorted_glob(mask):
     return sorted(glob(mask))
 
