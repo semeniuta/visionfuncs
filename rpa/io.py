@@ -5,12 +5,12 @@ from glob import glob
 import numpy as np
 
 
-def open_image(fname, read_flag=cv2.IMREAD_COLOR, color_transform=None):
+def open_image(fname, read_flag=cv2.IMREAD_ANYCOLOR, color_transform=None):
     """
     Open image usign OpenCV.
 
     Possible `read_flag`s are cv2.IMREAD_GRAYSCALE, cv2.IMREAD_COLOR, cv2.IMREAD_ANYCOLOR.
-    Example of a`color_transform` is cv2.COLOR_BGR2RGB
+    Example of a`color_transform`: cv2.COLOR_BGR2RGB, cv2.COLOR_BGR2GRAY
     """
 
     im = cv2.imread(fname, read_flag)

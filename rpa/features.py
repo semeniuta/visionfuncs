@@ -35,7 +35,7 @@ def create_concrete_feature_cg(method):
 
         return fd.detectAndCompute(im, mask)
 
-    new_inputs = ('image', 'mask')  + param_names
+    new_inputs = ('image', 'mask') + param_names
 
     add_func_dict = {'detect_and_describe_features': func}
     add_func_io = {
