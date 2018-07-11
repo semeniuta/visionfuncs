@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from epypes.compgraph import CompGraph, FunctionPlaceholder, add_new_vertices, graph_union_with_suffixing
 
 METHOD_PARAMS = {
@@ -57,7 +58,9 @@ def create_feature_matching_cg(method):
     def match_func(descr_1, descr_2, normType, crossCheck):
 
         matcher = cv2.BFMatcher(normType, crossCheck)
-        return matcher.match(descr_1, descr_2)
+        matches = matcher.match(descr_1, descr_2)
+
+        return sorted(matches, key=(lambda m : m.distance))
 
     add_func_dict = {'match': match_func}
     add_func_io = {
@@ -67,6 +70,36 @@ def create_feature_matching_cg(method):
     cg = graph_union_with_suffixing(cg1, cg2, exclude=param_names)
     cg = add_new_vertices(cg, add_func_dict, add_func_io)
 
+    return cg
+
+
+def create_extended_feature_matching_cg(method):
+
+    def gather_keypoints(keypoints_1, keypoints_2, matches):
+
+        res = []
+
+        for m in matches:
+
+            idx_1 = m.queryIdx
+            idx_2 = m.trainIdx
+
+            pt_1 = keypoints_1[idx_1].pt
+            pt_2 = keypoints_2[idx_2].pt
+
+            row = [pt_1[0], pt_1[1], pt_2[0], pt_2[1]]
+            res.append(row)
+
+        return np.array(res)
+
+    cg = create_feature_matching_cg(method)
+
+    add_func_dict = {'gather_keypoints': gather_keypoints}
+    add_func_io = {
+        'gather_keypoints': (('keypoints_1', 'keypoints_2', 'matches',), 'keypoints_paired')
+    }
+
+    cg = add_new_vertices(cg, add_func_dict, add_func_io)
     return cg
 
 
