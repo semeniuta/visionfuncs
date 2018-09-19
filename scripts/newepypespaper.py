@@ -41,8 +41,10 @@ if __name__ == '__main__':
 
     runner = CompGraphRunner(cg, params)
 
-    nxg = get_networkx_graph(runner, style_attrs={'fontname': 'Helvetica'})
+    for k, obj in {'cg': cg, 'runner': runner}.items():
 
-    ag = to_agraph(nxg)
-    ag.layout('dot')
-    ag.draw('simple_cg.pdf')
+        nxg = get_networkx_graph(obj, style_attrs={'fontname': 'Helvetica'})
+
+        ag = to_agraph(nxg)
+        ag.layout('dot')
+        ag.draw('simple_cg_{}.pdf'.format(k))
