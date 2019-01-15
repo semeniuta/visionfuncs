@@ -147,6 +147,11 @@ def rvec_to_rmat(rvec):
     return rmat
 
 
+def project_points(object_points, rvec, tvec, cm, dc):
+    projected, _ = cv2.projectPoints(object_points, rvec, tvec, cm, dc)
+    return projected.reshape(-1, 2)
+
+
 def get_im_wh(im):
     h, w = im.shape[:2]
     return w, h
@@ -199,7 +204,7 @@ class CGSolvePnP(compgraph.CompGraph):
         }
 
         func_io = {
-            'solve_pnp': (('pattern_points', 'image_points', 'cam_matrix', 'dist_coefs', 'use_extrinsic_guess'),
+            'solve_pnp': (('pattern_points', 'image_points', 'cam_matrix', 'dist_coefs'),
                           ('rvec', 'tvec')),
 
             'rvec_to_rmat': ('rvec', 'rmat')
