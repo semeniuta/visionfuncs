@@ -1,3 +1,5 @@
+import cv2
+import numpy as np
 
 
 def canny(img, low_threshold, high_threshold):

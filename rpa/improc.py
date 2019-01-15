@@ -1,3 +1,6 @@
+import cv2
+import numpy as np
+
 
 def grayscale(im, flag=cv2.COLOR_BGR2GRAY):
     return cv2.cvtColor(im, flag)

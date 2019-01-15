@@ -1,3 +1,7 @@
+import cv2
+import numpy as np
+
+
 def find_hough_lines(im_masked, rho, theta, threshold, min_line_length, max_line_gap):
 
     lines = cv2.HoughLinesP(im_masked, rho, theta, threshold, np.array([]), minLineLength=min_line_length, maxLineGap=max_line_gap)

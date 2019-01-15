@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def e2h(x):
     """
     Transform a Euclidean vector to homogeneous form

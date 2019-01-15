@@ -1,3 +1,7 @@
+import cv2
+import numpy as np
+
+
 def get_rectangle_corners_from_cbc(cbc, nx, ny):
     """
     Get 4 points eclosing the chessboard region in an image

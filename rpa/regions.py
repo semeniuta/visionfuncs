@@ -1,4 +1,5 @@
-
+import cv2
+import numpy as np
 
 def apply_region_mask(image, region_vertices):
 
