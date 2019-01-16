@@ -2,7 +2,15 @@ import cv2
 import numpy as np
 
 
-def find_hough_lines(im_masked, rho, theta, threshold, min_line_length, max_line_gap):
+def hough_lines(im_masked, rho, theta, threshold, min_line_length, max_line_gap):
+    """
+    rho - distance resolution of the accumulator in pixels.
+    theta - angle resolution of the accumulator in radians.
+    threshold - accumulator threshold parameter;
+                only those lines are returned that get enough votes ( >threshold ).
+    min_line_Length - minimum line length. Line segments shorter than that are rejected.
+    max_line_gap – maximum allowed gap between points on the same line to link them.
+    """
 
     lines = cv2.HoughLinesP(im_masked, rho, theta, threshold, np.array([]), minLineLength=min_line_length, maxLineGap=max_line_gap)
     return lines.reshape(lines.shape[0], 4)
