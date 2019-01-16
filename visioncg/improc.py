@@ -2,6 +2,16 @@ import cv2
 import numpy as np
 
 
+def threshold_binary_inv(im, t):
+    """
+    All pixels with intensity < t become 255
+    and the rest become 0
+    """
+    
+    _, im_t = cv2.threshold(im, t, 255, cv2.THRESH_BINARY_INV)
+    return im_t
+
+
 def grayscale(im, flag=cv2.COLOR_BGR2GRAY):
     return cv2.cvtColor(im, flag)
 
@@ -49,3 +59,9 @@ def weighted_sum_images(images, weights):
         res = cv2.addWeighted(res, 1., images[i], weights[i], 0)
 
     return res
+
+
+def dilate(im, kernel_size, n_iter=1):
+
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+    return cv2.dilate(im, kernel, iterations=n_iter)
