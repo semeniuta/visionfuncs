@@ -37,3 +37,11 @@ def bitwise_or(images):
         res = cv2.bitwise_or(res, im)
 
     return res
+
+
+def crop_rectangle(im, x0, y0, w, h):
+
+    x1 = x0 + w
+    y1 = y0 + h
+
+    return im[y0:y1, x0:x1]
