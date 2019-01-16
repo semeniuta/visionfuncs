@@ -1,9 +1,6 @@
 import cv2
 import numpy as np
-
-
-def canny(img, low_threshold, high_threshold):
-    return cv2.Canny(img, low_threshold, high_threshold)
+from .improc import scale_image_255
 
 
 def sobel_x(im):
