@@ -1,5 +1,27 @@
 import cv2
 import numpy as np
+import pandas as pd
+
+
+def threshold_binary_inv(im, t):
+    """
+    All pixels with intensity < t become 255
+    and the rest become 0
+    """
+    
+    _, im_t = cv2.threshold(im, t, 255, cv2.THRESH_BINARY_INV)
+    return im_t
+
+
+def threshold_binary(im, t):
+    """
+    All pixels with intensity > t become 255
+    and the rest become 0
+    """
+    
+    _, im_t = cv2.threshold(im, t, 255, cv2.THRESH_BINARY)
+    return im_t
+
 
 def apply_region_mask(image, region_vertices):
 
@@ -45,3 +67,36 @@ def crop_rectangle(im, x0, y0, w, h):
     y1 = y0 + h
 
     return im[y0:y1, x0:x1]
+
+
+def find_ccomp(im, *args, **kwargs):
+    """
+    Finds connected components in a binary image.
+    Returns the label image and a Pandas data frame
+    with the connected components' statistics.
+
+    *args and **kwargs are forwarded to the
+    cv2.connectedComponentsWithStats call
+    """
+
+    num, labels, stats, centroids = cv2.connectedComponentsWithStats(im, *args, **kwargs)
+    
+    stats_df = pd.DataFrame(stats, columns=['left', 'top', 'width', 'height', 'area'])
+    stats_df['x'] = centroids[:,0]
+    stats_df['y'] = centroids[:,1]
+    
+    return labels, stats_df
+
+
+def ccomp_bbox_subimage(im, stats, i):
+    """
+    Crop a subimage corresponding to a 
+    single connected component.
+
+    i - integer-location index in the stats data frame 
+    (to be used with iloc)
+    """
+
+    left, top = stats.iloc[i].left, stats.iloc[i].top
+    w, h = stats.iloc[i].width, stats.iloc[i].height
+    return im[int(top):int(top+h), int(left):int(left+w)]

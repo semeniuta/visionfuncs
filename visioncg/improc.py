@@ -2,16 +2,6 @@ import cv2
 import numpy as np
 
 
-def threshold_binary_inv(im, t):
-    """
-    All pixels with intensity < t become 255
-    and the rest become 0
-    """
-    
-    _, im_t = cv2.threshold(im, t, 255, cv2.THRESH_BINARY_INV)
-    return im_t
-
-
 def grayscale(im, flag=cv2.COLOR_BGR2GRAY):
     return cv2.cvtColor(im, flag)
 

@@ -58,3 +58,44 @@ def plot_image_channels(im, figsize=None, titles=None):
         plt.title(titles[i])
 
 
+def plot_bbox(x, y, w, h, **kwargs):
+    """
+    Visualize a bounding box using Matplotlib. 
+    x, y - top left corner
+    w, h - widht and height of the bounding box
+    """
+
+    if kwargs == {}:
+        kwargs = {'color': 'cyan'}
+        
+    lines = [
+        [x, y, x+w, y],
+        [x, y, x, y+h],
+        [x+w, y, x+w, y+h],
+        [x, y+h, x+w, y+h],
+    ]
+
+    for line in lines:
+        plot_line(line, **kwargs)
+
+
+def plot_ccomp(stats_df, color_centroids='yellow', color_bbox='cyan'):
+
+    def get_val(i, attr):
+        return stats_df.iloc[i][attr]
+
+    for i in range(len(stats_df)):
+
+        x, y = get_val(i, 'x'), get_val(i, 'y')
+        left, top = get_val(i, 'left'), get_val(i, 'top')
+        w, h = get_val(i, 'width'), get_val(i, 'height')
+
+        plt.scatter([x], [y], color=color_centroids)
+        plt.text(x, y, i, color=color_centroids)
+
+        x0 = x - w / 2.
+        y0 = y - h / 2.
+
+        plot_bbox(x0, y0, w, h, color=color_bbox)
+
+
