@@ -20,6 +20,20 @@ def add_contrast(im, gain):
     return scale_image_255(gained)
 
 
+def invert(image):
+    return 255 - image
+    
+
+def clamp(image, a, b):
+    """
+    Clamp the range of intesities of the image 
+    from (0, 255) to a custom range (a, b).
+    """
+
+    interval_len = b - a    
+    return (interval_len / 255.0) * image + a
+
+
 def scale_image_255(im):
     """
     Scale an image to pixel range [0, 255]
