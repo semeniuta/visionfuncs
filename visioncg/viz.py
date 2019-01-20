@@ -99,3 +99,11 @@ def plot_ccomp(stats_df, color_centroids='yellow', color_bbox='cyan'):
         plot_bbox(x0, y0, w, h, color=color_bbox)
 
 
+def plot_circles(circles, color='b'):
+
+    circle_objects = [plt.Circle((x, y), radius, edgecolor=color, fill=False) for x, y, radius in circles]
+    fig = plt.gcf()
+    for c in circle_objects:
+        fig.gca().add_artist(c)
+
+
