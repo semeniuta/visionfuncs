@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 
 
@@ -48,3 +49,34 @@ def pixel_points_to_meters(points, meters_in_pix_x, meters_in_pix_y):
     res[:, 1] = points[:, 1] * meters_in_pix_y
 
     return res
+
+
+def rvec_to_rmat(rvec):
+    rmat, _ = cv2.Rodrigues(rvec)
+    return rmat
+
+
+def triangulate_points(P1, P2, points1, points2):
+    """
+    Triangulate 3D coordinates of points
+    based on point matches in two images.
+    
+    P1 - projection matrix of camera 1.
+    P2 - projection matrix of camera 2.
+    points1, points2 - arrays of corresponding
+      points im image 1 and 2 respectively,
+      each with dimension of (n x 2), 
+      where n is the number of points.
+    """
+
+    assert points1.shape[0] == points2.shape[0]
+    assert points1.shape[1] == 2 and points2.shape[1] == 2
+
+    ptcloud_h = cv2.triangulatePoints(P1, P2, points1.T, points2.T)
+    
+    ptcloud = np.zeros((points1.shape[0], 3))
+
+    for i in range(3):
+        ptcloud[:, i] = ptcloud_h[i, :] / ptcloud_h[-1, :]
+    
+    return ptcloud

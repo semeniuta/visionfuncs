@@ -3,6 +3,7 @@
 import cv2
 import numpy as np
 from epypes import compgraph
+from .geometry import rvec_to_rmat
 
 findcbc_flags = {
     'default': cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_NORMALIZE_IMAGE,
@@ -41,6 +42,12 @@ def cbc_opencv_to_numpy(success, cbc_res):
         return None
 
 
+def find_corners_in_one_image(im, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
+
+    found, corners = find_cbc(im, pattern_size_wh, searchwin_size, findcbc_flags)
+    return cbc_opencv_to_numpy(found, corners)
+
+
 def prepare_corners(images, pattern_size_wh, searchwin_size=5, findcbc_flags=None):
     """
     Find chessboard corners in the supplied images.
@@ -53,8 +60,8 @@ def prepare_corners(images, pattern_size_wh, searchwin_size=5, findcbc_flags=Non
 
     for i, im in enumerate(images):
 
-        found, corners = find_cbc(im, pattern_size_wh, searchwin_size, findcbc_flags)
-        corners_list.append(cbc_opencv_to_numpy(found, corners))
+        res = find_corners_in_one_image(im, pattern_size_wh, searchwin_size, findcbc_flags)
+        corners_list.append(res)
 
     return corners_list
 
@@ -100,20 +107,6 @@ def calibrate_stereo(object_points, impoints_1, impoints_2, cm_1, dc_1, cm_2, dc
     return R, T, E, F
 
 
-def triangulate_points(P1, P2, points1, points2):
-
-    points1_matrix = np.transpose(np.array(points1))
-    points2_matrix = np.transpose(np.array(points2))
-
-    res = cv2.triangulatePoints(P1, P2, points1_matrix, points2_matrix)
-    res = np.transpose(res)
-
-    #res_real = np.array([[row[i] / row[3] for i in range(3)] for row in res])
-    #return res_real
-
-    return res
-
-
 def prepare_object_points(num_images, pattern_size_wh, square_size):
     """
     Prepare a list of object points matrices
@@ -140,11 +133,6 @@ def solve_pnp_ransac(pattern_points, image_points, cam_matrix, dist_coefs,
 
     return cv2.solvePnPRansac(pattern_points, image_points, cam_matrix, dist_coefs,
                               use_extrinsic_guess, iter_count, reproj_err_threshold, confidence)
-
-
-def rvec_to_rmat(rvec):
-    rmat, _ = cv2.Rodrigues(rvec)
-    return rmat
 
 
 def project_points(object_points, rvec, tvec, cm, dc):
@@ -199,13 +187,15 @@ class CGSolvePnP(compgraph.CompGraph):
     def __init__(self):
 
         func_dict = {
+            'detect_corners': find_corners_in_one_image,
             'solve_pnp': cv2.solvePnP,
             'rvec_to_rmat': rvec_to_rmat
         }
 
         func_io = {
+            'detect_corners': (('image', 'pattern_size_wh'), 'image_points'),
             'solve_pnp': (('pattern_points', 'image_points', 'cam_matrix', 'dist_coefs'),
-                          ('rvec', 'tvec')),
+                          ('pnp_retval', 'rvec', 'tvec')),
 
             'rvec_to_rmat': ('rvec', 'rmat')
         }
