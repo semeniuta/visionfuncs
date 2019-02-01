@@ -230,3 +230,20 @@ class CGCalibrateStereo(compgraph.CompGraph):
         }
 
         super(CGCalibrateStereo, self).__init__(func_dict, func_io)
+
+
+class CGFindCorners(compgraph.CompGraph):
+
+     def __init__(self):
+
+         func_dict = {
+            'find_corners': find_cbc,
+            'reformat_corners': cbc_opencv_to_numpy
+        }
+
+         func_io = {
+            'find_corners': (('image', 'pattern_size_wh'), ('success', 'corners_opencv')),
+            'reformat_corners': (('success', 'corners_opencv'), 'corners_np')
+        }
+
+         super(CGFindCorners, self).__init__(func_dict, func_io)
