@@ -19,5 +19,13 @@ def sobel_magnitude(sobelx, sobely):
     return np.sqrt(np.square(sobelx) + np.square(sobely))
 
 
+def sobel_magnitude_from_image(im):
+
+    sobelx = sobel_x(im)
+    sobely = sobel_y(im)
+
+    return sobel_magnitude(sobelx, sobely)
+
+
 def sobel_direction(sobelx, sobely):
     return np.arctan2(np.abs(sobely), np.abs(sobelx))
