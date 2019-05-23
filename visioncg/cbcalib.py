@@ -136,8 +136,29 @@ def solve_pnp_ransac(pattern_points, image_points, cam_matrix, dist_coefs,
 
 
 def project_points(object_points, rvec, tvec, cm, dc):
+    """
+    Project points using cv2.projectPoints
+    and reshape the result to (n_points, 2)
+    """
+
     projected, _ = cv2.projectPoints(object_points, rvec, tvec, cm, dc)
     return projected.reshape(-1, 2)
+
+
+def reprojection_rms(impoints_known, impoints_reprojected):
+    """
+    Compute root mean square (RMS) error of points
+    reprejection (cv2.projectPoints).
+
+    Both input NumPy arrays should be of shape (n_points, 2)
+    """
+
+    diff = impoints_known - impoints_reprojected
+
+    squared_distances = np.sum(np.square(diff), axis=1)
+    rms = np.sqrt(np.mean(squared_distances))
+
+    return rms
 
 
 def get_im_wh(im):
