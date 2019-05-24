@@ -224,6 +224,23 @@ class CGSolvePnP(compgraph.CompGraph):
         super(CGSolvePnP, self).__init__(func_dict, func_io)
 
 
+class CGPreparePointsStereo(compgraph.CompGraph):
+
+    def __init__(self):
+
+        func_dict = {
+            'prepare_corners': prepare_corners_stereo,
+            'prepare_object_points': prepare_object_points,
+        }
+
+        func_io = {
+            'prepare_corners': (('calibration_images_1', 'calibration_images_2', 'pattern_size_wh'), ('image_points_1', 'image_points_2', 'num_images')),
+            'prepare_object_points': (('num_images', 'pattern_size_wh', 'square_size'), 'object_points'),
+        }
+
+        super(CGPreparePointsStereo, self).__init__(func_dict, func_io)
+
+
 class CGCalibrateStereo(compgraph.CompGraph):
 
     def __init__(self):
