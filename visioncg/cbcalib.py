@@ -113,8 +113,11 @@ def prepare_object_points(num_images, pattern_size_wh, square_size):
     """
 
     pattern_points = get_pattern_points(pattern_size_wh, square_size)
-    object_points = [pattern_points for i in range(num_images)]
-    return object_points
+    return make_list_of_identical_pattern_points(num_images, pattern_points)
+
+
+def make_list_of_identical_pattern_points(num_images, pattern_points):
+    return [pattern_points for i in range(num_images)]
 
 
 def get_pattern_points(pattern_size_wh, square_size):
@@ -180,6 +183,54 @@ def undistort_and_rectify_images_stereo(images1, images2, cm1, dc1, cm2, dc2, R1
 
     return images1_rect, images2_rect, maps1, maps2
 
+def prepare_indices_stereocalib(corners1, corners2):
+    """
+    Return indices between 0 and num_images
+    for which chessboard corners were detected
+    in both left and right image (i.e. neither in corners1 
+    nor in corners2 there is None at those indices).
+    """
+
+    indices = []
+
+    idx = 0
+    for c1, c2 in zip(corners1, corners2):
+        
+        if not ((c1 is None) or (c2 is None)):
+            indices.append(idx)
+        
+        idx += 1
+
+    return indices
+
+
+def create_stereo_cg():
+
+    cg_base = CGCalibrateStereoBase()
+
+    func_dict = {
+        'prepare_corners': prepare_corners_stereo,
+        'prepare_object_points': prepare_object_points,
+    }
+
+    func_io = {
+        
+        'prepare_corners': (
+            ('calibration_images_1', 'calibration_images_2', 'pattern_size_wh'), 
+            ('image_points_1', 'image_points_2', 'num_images')
+        ),
+
+        'prepare_object_points': (
+            ('num_images', 'pattern_size_wh', 'square_size'), 
+            'object_points'
+        ),
+
+    }
+
+    cg_front = compgraph.CompGraph(func_dict, func_io)
+
+    return compgraph.graph_union(cg_front, cg_base)
+
 
 class CGCalibrateCamera(compgraph.CompGraph):
 
@@ -229,13 +280,17 @@ class CGPreparePointsStereo(compgraph.CompGraph):
     def __init__(self):
 
         func_dict = {
-            'prepare_corners': prepare_corners_stereo,
-            'prepare_object_points': prepare_object_points,
+            'prepare_corners_1': prepare_corners,
+            'prepare_corners_2': prepare_corners,
+            'prepare_indices': prepare_indices_stereocalib,
+            'get_pattern_points': get_pattern_points,
         }
 
         func_io = {
-            'prepare_corners': (('calibration_images_1', 'calibration_images_2', 'pattern_size_wh'), ('image_points_1', 'image_points_2', 'num_images')),
-            'prepare_object_points': (('num_images', 'pattern_size_wh', 'square_size'), 'object_points'),
+            'prepare_corners_1': (('calibration_images_1', 'pattern_size_wh'), 'image_points_1'),
+            'prepare_corners_2': (('calibration_images_2', 'pattern_size_wh'), 'image_points_2'),
+            'prepare_indices': (('image_points_1', 'image_points_2'), 'indices'),
+            'get_pattern_points': (('pattern_size_wh', 'square_size'), 'pattern_points'),
         }
 
         super(CGPreparePointsStereo, self).__init__(func_dict, func_io)
@@ -244,10 +299,15 @@ class CGPreparePointsStereo(compgraph.CompGraph):
 class CGCalibrateStereo(compgraph.CompGraph):
 
     def __init__(self):
+        cg = create_stereo_cg()
+        super(CGCalibrateStereo, self).__init__(cg.functions, cg.func_io)
+
+
+class CGCalibrateStereoBase(compgraph.CompGraph):
+
+    def __init__(self):
 
         func_dict = {
-            'prepare_corners': prepare_corners_stereo,
-            'prepare_object_points': prepare_object_points,
             'calibrate_camera_1': calibrate_camera,
             'calibrate_camera_2': calibrate_camera,
             'calibrate_stereo': calibrate_stereo,
@@ -255,8 +315,6 @@ class CGCalibrateStereo(compgraph.CompGraph):
         }
 
         func_io = {
-            'prepare_corners': (('calibration_images_1', 'calibration_images_2', 'pattern_size_wh'), ('image_points_1', 'image_points_2', 'num_images')),
-            'prepare_object_points': (('num_images', 'pattern_size_wh', 'square_size'), 'object_points'),
             'calibrate_camera_1': (('im_wh', 'object_points', 'image_points_1'),
                                   ('rms_1', 'cm_1', 'dc_1', 'rvecs_1', 'tvecs_1')),
             'calibrate_camera_2': (('im_wh', 'object_points', 'image_points_2'),
@@ -267,7 +325,7 @@ class CGCalibrateStereo(compgraph.CompGraph):
                                                  ('R1', 'R2', 'P1', 'P2', 'Q', 'validPixROI1', 'validPixROI2'))
         }
 
-        super(CGCalibrateStereo, self).__init__(func_dict, func_io)
+        super(CGCalibrateStereoBase, self).__init__(func_dict, func_io)
 
 
 class CGFindCorners(compgraph.CompGraph):
