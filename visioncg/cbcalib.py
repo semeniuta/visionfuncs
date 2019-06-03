@@ -1,4 +1,6 @@
-# Vision systems calibration using a chessboard caloibratiob object
+"""
+Vision systems calibration using a chessboard calibration object
+"""
 
 import cv2
 import numpy as np
@@ -151,7 +153,7 @@ def project_points(object_points, rvec, tvec, cm, dc):
 def reprojection_rms(impoints_known, impoints_reprojected):
     """
     Compute root mean square (RMS) error of points
-    reprejection (cv2.projectPoints).
+    reprojection (cv2.projectPoints).
 
     Both input NumPy arrays should be of shape (n_points, 2)
     """
@@ -182,6 +184,7 @@ def undistort_and_rectify_images_stereo(images1, images2, cm1, dc1, cm2, dc2, R1
     images2_rect = [cv2.remap(im, maps2[0], maps2[1], interp_method) for im in images2]
 
     return images1_rect, images2_rect, maps1, maps2
+
 
 def prepare_indices_stereocalib(corners1, corners2):
     """
