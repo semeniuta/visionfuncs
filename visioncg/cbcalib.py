@@ -166,6 +166,46 @@ def reprojection_rms(impoints_known, impoints_reprojected):
     return rms
 
 
+def reproject_and_measure_error(image_points, object_points, rvecs, tvecs, cm, dc):
+    """
+    Given a list of image points (a NumPy array per image) and 
+    a list of known object points (a NumPy array per image),
+    perform reprojection for each image 
+    with the known camera intrinsics (cm, dc) and extrinsics (rvecs, tvecs), 
+    and measure RMS reprojection error for all points in all images. 
+    """
+    
+    reproj_list = []
+    
+    for ip, op, rvec, tvec in zip(image_points, object_points, rvecs, tvecs):
+
+        ip_reprojected = project_points(op, rvec, tvec, cm, dc)
+        reproj_list.append(ip_reprojected)
+        
+    reproj_all = np.concatenate(reproj_list, axis=0)
+    original_all = np.concatenate(image_points, axis=0)
+    
+    rms = reprojection_rms(original_all, reproj_all)
+    return rms
+
+
+def triangulate_impoints(P1, P2, impoints_1, impoints_2):
+    """
+    Perform triangulation of image points for 
+    each image pair and collect the resulting 
+    3D point clouds in a list.
+    """
+    
+    points_3d_list = []
+    
+    for imp_1, imp_2 in zip(impoints_1, impoints_2):
+
+        points_3d = triangulate_points(P1, P2, imp_1, imp_2)
+        points_3d_list.append(points_3d)
+        
+    return points_3d_list
+
+
 def get_im_wh(im):
     h, w = im.shape[:2]
     return w, h
