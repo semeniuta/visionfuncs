@@ -100,3 +100,23 @@ def ccomp_bbox_subimage(im, stats, i):
     left, top = stats.iloc[i].left, stats.iloc[i].top
     w, h = stats.iloc[i].width, stats.iloc[i].height
     return im[int(top):int(top+h), int(left):int(left+w)]
+
+
+def fill_holes_based_on_contours():
+    """
+    Fill holes inside an object in a binary image
+    using cv2.findContours.
+
+    An object is characterized by white color (255),
+    while the background is black (0)
+
+    See example of this technique at:
+    https://stackoverflow.com/questions/10316057/filling-holes-inside-a-binary-object
+    """
+
+    im_out, contour, _ = cv2.findContours(im_input, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+
+    for cnt in contour:
+        cv2.drawContours(im_out, [cnt], 0, 255, -1)
+
+    return im_out
