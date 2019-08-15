@@ -102,7 +102,7 @@ def ccomp_bbox_subimage(im, stats, i):
     return im[int(top):int(top+h), int(left):int(left+w)]
 
 
-def fill_holes_based_on_contours():
+def fill_holes_based_on_contours(im_input):
     """
     Fill holes inside an object in a binary image
     using cv2.findContours.
