@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from epypes import compgraph
 from .geometry import rvec_to_rmat
+from .geometry import triangulate_points
 
 findcbc_flags = {
     'default': cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_NORMALIZE_IMAGE,
