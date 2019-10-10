@@ -283,12 +283,27 @@ def cb_col(corners, pattern_size_wh, col_idx):
 def cb_diag(corners, pattern_size_wh):
     """
     Get all diagonal chessboard corners
-    from (0, 0) to (n_rows, n_rows)
+    from (0, 0) to (n_rows, n_rows).
     """
     
     row_size, n_rows = pattern_size_wh
     
     return np.array([corners[i * row_size + i] for i in range(n_rows)])
+
+
+def corners_to_homog(corners):
+    """
+    Transform chessboard corners to homogeneous
+    coordinates, with the matrix of shape
+    (3, n) being returned.
+    """
+    
+    n = len(corners)
+    
+    corners_with_one = np.ones((n, 3))
+    corners_with_one[:, :2] = corners
+    
+    return corners_with_one.T
 
 
 def create_stereo_cg():
