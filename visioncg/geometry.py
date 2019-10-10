@@ -109,3 +109,19 @@ def hnormalize(p):
             res[:2, j] = p[:2, j] / p[2, j]
     
     return res
+
+
+def fit_line_2d(points):
+    """
+    Fit a line to 2D points (supplied as a (n, 2) matrix)
+    and return the coefficient as a homogeneous line vector
+    [a, b, c], corresponding to equation a*x + b*y + c = 0
+    """
+    
+    x = points[:, 0]
+    y = points[:, 1]
+    
+    a, b = np.polyfit(x, y, deg=1)
+    
+    return np.array([a, -1, b])
+
