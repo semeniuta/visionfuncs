@@ -248,6 +248,49 @@ def prepare_indices_stereocalib(corners1, corners2):
     return indices
 
 
+def cb_row(corners, pattern_size_wh, row_idx):
+    """
+    Get a row of chessboard corners with index row_idx.
+
+    If non-valid row_idx is provided, None is returned.
+    """
+    
+    row_size, n_rows = pattern_size_wh
+    
+    if row_idx < 0 or row_idx >= n_rows:
+        return None
+    
+    offset = row_idx * row_size
+    
+    return corners[offset:offset+row_size, :]
+
+
+def cb_col(corners, pattern_size_wh, col_idx):
+    """
+    Get a column of chessboard corners with index col_idx.
+
+    If non-valid col_idx is provided, None is returned.
+    """
+    
+    n_cols, col_size = pattern_size_wh
+    
+    if col_idx < 0 or col_idx >= n_cols:
+        return None
+        
+    return np.array([corners[i * n_cols + col_idx, :] for i in range(col_size)])
+
+
+def cb_diag(corners, pattern_size_wh):
+    """
+    Get all diagonal chessboard corners
+    from (0, 0) to (n_rows, n_rows)
+    """
+    
+    row_size, n_rows = pattern_size_wh
+    
+    return np.array([corners[i * row_size + i] for i in range(n_rows)])
+
+
 def create_stereo_cg():
 
     cg_base = CGCalibrateStereoBase()
