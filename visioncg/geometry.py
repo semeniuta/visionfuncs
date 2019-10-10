@@ -15,7 +15,6 @@ def h2e(x):
     Transform a homogeneous vector to Euclidean form
     """
 
-    x = np.array(x)
     return x[:-1] / x[-1]
 
 
@@ -80,3 +79,32 @@ def triangulate_points(P1, P2, points1, points2):
         ptcloud[:, i] = ptcloud_h[i, :] / ptcloud_h[-1, :]
     
     return ptcloud
+
+
+def theta_rho(line):
+    """
+    Given a homogenous vector representing a line
+    returns a tuple (cos(theta), sin(theta), rho)
+    for a line represented in a form
+    rho = x*cos(theta) + y*sin(that)
+    """
+
+    norm = np.linalg.norm(line[:2])
+    return np.array([line[0]/norm, line[1]/norm, -line[2]/norm])
+
+
+def hnormalize(p):
+    """
+    Normalize a homogeneous vector p so that p[-1] = 1.
+    Works also for vectors horizontally stacked in a matrix
+    (where each vector is a column)
+    """
+
+    if p.ndim == 1:
+        res = p / p[-1]
+    else:
+        res = np.ones_like(p)
+        for j in range(p.shape[1]):
+            res[:2, j] = p[:2, j] / p[2, j]
+    
+    return res
