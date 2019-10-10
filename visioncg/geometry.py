@@ -84,7 +84,8 @@ def triangulate_points(P1, P2, points1, points2):
 def theta_rho(line):
     """
     Given a homogenous vector representing a line
-    returns a tuple (cos(theta), sin(theta), rho)
+    in 2D [a, b, c] (a*x + b*y + c = 0),
+    return a vector [cos(theta), sin(theta), rho]
     for a line represented in a form
     rho = x*cos(theta) + y*sin(that)
     """
