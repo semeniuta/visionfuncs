@@ -28,12 +28,13 @@ def get_rectangle_corners_from_cbc(cbc, pattern_size_wh):
     return points
 
 
-def get_rectangle_corners_in_image(im_sz, offset_x, offset_y):
+def get_rectangle_corners_in_image(warped_sz, offset_x, offset_y):
     """
     Get 4 points describing a rectangle in the image, offsetted
-    by the given amounts from the edges.
+    by the given amounts from the edges, 
+    along with the size of the resulting warted image.
 
-    im_sz -- image size (cols, rows)
+    warped_sz -- size of the target rectangular region 
     offset_x, offset_y -- offsets in pixels from the edges of the image
 
     Returns a (4 x 2) matrix with each point as a row:
@@ -41,16 +42,36 @@ def get_rectangle_corners_in_image(im_sz, offset_x, offset_y):
     [top right   ]
     [bottom right]
     [bottom left ]
+    and the size of the resulting image, accounting for the offsets.
     """
+
+    warped_x, warped_y = warped_sz
+
+    warped_canvas_sz = (warped_x + 2 * offset_x, warped_y + 2 * offset_y)
+    cols, rows = warped_canvas_sz
 
     points = np.array([
         [offset_x, offset_y],
-        [im_sz[0]-offset_x, offset_y],
-        [im_sz[0]-offset_x, im_sz[1]-offset_y],
-        [offset_x, im_sz[1]-offset_y]
+        [cols-offset_x, offset_y],
+        [cols-offset_x, rows-offset_y],
+        [offset_x, rows-offset_y]
     ], dtype=np.float32)
 
-    return points
+    return points, warped_canvas_sz
+
+
+def cb_dim_proportion(pattern_size_wh, factor=1):
+    """
+    Given the chessboard pattern size pattern_size_wh = (nx, ny), 
+    i.e. number of corners in horizonal and vertical direction, 
+    return the proportion (h, v) of the number of squares
+    in horizontal and vertical direction, multiplied with 
+    an optional factor. 
+    """
+        
+    numbers_of_squares = (n_points - 1 for n_points in pattern_size_wh)
+    
+    return tuple(n_sq * factor for n_sq in numbers_of_squares)
 
 
 def warp(im, M, canvas_sz):
