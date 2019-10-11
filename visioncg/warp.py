@@ -2,12 +2,12 @@ import cv2
 import numpy as np
 
 
-def get_rectangle_corners_from_cbc(cbc, nx, ny):
+def get_rectangle_corners_from_cbc(cbc, pattern_size_wh):
     """
     Get 4 points eclosing the chessboard region in an image
 
     cbc -- a (n x 2) NumPy array with each chessboard corner as a row
-    nx, ny -- number of corners in x and y direction
+    pattern_size_wh -- a tuple (nx, ny) with the number of corners in x and y direction
 
     Returns a (4 x 2) matrix with each point as a row:
     [top left    ]
@@ -15,6 +15,8 @@ def get_rectangle_corners_from_cbc(cbc, nx, ny):
     [bottom right]
     [bottom left ]
     """
+
+    nx, ny = pattern_size_wh
 
     points = np.array([
         cbc[0,:],
@@ -54,7 +56,7 @@ def get_rectangle_corners_in_image(im_sz, offset_x, offset_y):
 def warp(im, M, canvas_sz):
     """
     Warp an image im given the perspective transformation matrix M and
-    the output image size canvas_sz
+    the output image size canvas_sz (cols, rows)
     """
 
     return cv2.warpPerspective(im, M, canvas_sz, flags=cv2.INTER_LINEAR)
