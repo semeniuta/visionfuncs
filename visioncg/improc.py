@@ -69,3 +69,28 @@ def dilate(im, kernel_size, n_iter=1):
 
     kernel = np.ones((kernel_size, kernel_size), np.uint8)
     return cv2.dilate(im, kernel, iterations=n_iter)
+
+
+def image_histogram(im, n_bins=32, as_float=False):
+    """
+    Compute image histogram and return 
+    the per-bin counts as an 1D array
+    """
+
+    counts, _ = np.histogram(im, bins=n_bins, range=(0, 256))
+    
+    if as_float:
+        return np.array(counts, dtype=np.float64)
+    
+    return np.array(counts)
+
+
+def image_is_dark(im, share=0.95):
+    """
+    Simple test for a grayscale image
+    being mostly dark/black.
+    """
+
+    n_pixels = im.shape[0] * im.shape[1]
+    hist = image_histogram(im)
+    return hist[0] >= share * n_pixels
