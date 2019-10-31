@@ -120,3 +120,16 @@ def fill_holes_based_on_contours(im_input):
         cv2.drawContours(im_out, [cnt], 0, 255, -1)
 
     return im_out
+
+
+def gather_masked_pixels(im, mask):
+    """
+    For an image and the mask, 
+    gather all pixels that 
+    belong to the mask as a 1D array
+    """
+
+    mask = mask.astype(np.bool)
+    values = im[mask]
+
+    return values
