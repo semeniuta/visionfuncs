@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+import math
 
 
 def draw_line(canvas_im, line, color=[255, 0, 0], thickness=2):
@@ -105,5 +106,22 @@ def plot_circles(circles, color='b'):
     fig = plt.gcf()
     for c in circle_objects:
         fig.gca().add_artist(c)
+
+
+def imshow_grid(images, n_cols=4, titles=None):
+
+    if titles is not None:
+        assert len(images) == len(titles)
+
+    n_cols = 4
+    n_rows = math.ceil(len(images) / n_cols)
+
+    for i, im in enumerate(images):
+        plt.subplot(n_rows, n_cols, i+1)
+        plt.imshow(im)
+        plt.axis('off')
+
+        if titles is not None:
+            plt.title(titles[i])
 
 
