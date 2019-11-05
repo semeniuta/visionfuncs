@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import pandas as pd
+import math
 
 
 def threshold_binary_inv(im, t):
@@ -133,3 +134,39 @@ def gather_masked_pixels(im, mask):
     values = im[mask]
 
     return values
+
+
+def region_ellipse_from_moments(im_binary):
+    """
+    Estimate equivalent ellipse from binary image moments.
+
+    Returns:
+    center_x, center_y -- x and y coordinates of the ellipse center (center og gravity)
+    d1, d2 -- larger and smaller diameters of the ellipse
+    theta -- angle between x axis and the d1
+
+    A nice tutorial:
+    http://raphael.candelier.fr/?blog=Image%20Moments
+    """
+    
+    m = cv2.moments(im_binary, binaryImage=True)
+    
+    area = m['m00']
+
+    center_x = m['m10'] / area
+    center_y = m['m01'] / area
+    
+    mu20 = m['mu20'] / area
+    mu02 = m['mu02'] / area
+    mu11 = m['mu11'] / area
+    
+    s = np.sqrt((mu20 - mu02)**2 + 4 * mu11**2)
+    d1 = 2 * np.sqrt(2 * (mu20 + mu02 + s))
+    d2 = 2 * np.sqrt(2 * (mu20 + mu02 - s))
+    
+    theta = 0.5 * math.atan(2 * mu11 / (mu20 - mu02))
+    
+    if mu20 < mu02:
+        theta += math.pi/2
+        
+    return center_x, center_y, d1, d2, theta
