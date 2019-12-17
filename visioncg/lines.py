@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from .geometry import hnormalize
 
 
 def hough_lines(im_masked, rho, theta, threshold, min_line_length, max_line_gap):
@@ -52,4 +53,6 @@ def line_vector_constant_y(val):
 def line_vector_from_opencv_points(line):
 
     x1, y1, x2, y2 = line
-    return np.cross([x1, y1, 1], [x2, y2, 1])
+    line_vec = np.cross([x1, y1, 1], [x2, y2, 1])
+
+    return hnormalize(line_vec)
