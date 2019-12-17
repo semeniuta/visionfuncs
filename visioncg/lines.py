@@ -28,6 +28,23 @@ def compute_line_tangents(lines):
     return tans
 
 
+def partition_lines(lines, tol=1e-3):
+
+    x1 = lines[:, 0]
+    y1 = lines[:, 1]
+    x2 = lines[:, 2]
+    y2 = lines[:, 3]
+
+    xdiff = np.abs(x2 - x1)
+    ydiff = np.abs(y2 - y1)
+
+    h_mask = ydiff <= tol
+    v_mask = xdiff <= tol
+    rest_mask = np.logical_and(np.logical_not(h_mask), np.logical_not(v_mask))
+
+    return lines[h_mask], lines[v_mask], lines[rest_mask]
+
+
 def line_vector_constant_y(val):
     return np.array([0, 1, -val])
 
