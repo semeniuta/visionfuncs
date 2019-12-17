@@ -56,3 +56,15 @@ def line_vector_from_opencv_points(line):
     line_vec = np.cross([x1, y1, 1], [x2, y2, 1])
 
     return hnormalize(line_vec)
+
+
+def opencv_points_to_line_vectors(lines):
+
+    n_lines = len(lines)
+
+    res = np.zeros((n_lines, 3))
+
+    for i, line in enumerate(lines):
+        res[i, :] = line_vector_from_opencv_points(line)
+
+    return res
