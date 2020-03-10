@@ -227,12 +227,15 @@ def undistort_and_rectify_images_stereo(images1, images2, cm1, dc1, cm2, dc2, R1
     return images1_rect, images2_rect, maps1, maps2
 
 
-def undistort_points(points, cm, dc):
+def undistort_points(points, cm, dc, P_mat=None, R_mat=None):
 
     n_points = len(points)
     src = points.reshape((n_points, 1, 2))
 
-    dst = cv2.undistortPoints(src, cm, dc, P=cm)
+    if P_mat is None:
+       P_mat = cm
+
+    dst = cv2.undistortPoints(src, cm, dc, P=P_mat, R=R_mat)
 
     return dst.reshape((n_points, 2))
 
