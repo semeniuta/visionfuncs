@@ -55,6 +55,21 @@ def rvec_to_rmat(rvec):
     return rmat
 
 
+def rmat_to_angle_axis(rmat):
+
+    rvec, _ = cv2.Rodrigues(rmat)
+
+    return rvec_to_angle_axis(rvec)
+
+
+def rvec_to_angle_axis(rvec):
+
+    theta = np.linalg.norm(rvec)
+    rvec_unit = rvec / theta
+
+    return theta, rvec_unit
+
+
 def triangulate_points(P1, P2, points1, points2):
     """
     Triangulate 3D coordinates of points
@@ -124,4 +139,3 @@ def fit_line_2d(points):
     a, b = np.polyfit(x, y, deg=1)
     
     return np.array([a, -1, b])
-
