@@ -71,6 +71,12 @@ def dilate(im, kernel_size, n_iter=1):
     return cv2.dilate(im, kernel, iterations=n_iter)
 
 
+def erode(im, kernel_size, n_iter=1):
+
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+    return cv2.erode(im, kernel, iterations=n_iter)
+
+
 def image_histogram(im, n_bins=32, as_float=False):
     """
     Compute image histogram and return 
