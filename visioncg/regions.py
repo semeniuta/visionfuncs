@@ -24,6 +24,11 @@ def threshold_binary(im, t):
     return im_t
 
 
+def apply_mask(im, mask):
+
+    return cv2.bitwise_and(im, im, mask=mask)
+
+
 def apply_region_mask(image, region_vertices):
 
     mask = np.zeros_like(image)
