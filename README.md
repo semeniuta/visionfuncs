@@ -1,12 +1,13 @@
-# VisionCG
+# visionfuncs
 
-VisionCG is a Python library providing a collection of common computer vision functions (based on OpenCV and NumPy) and computational graphs built from these functions (executable using EPypes). 
+`visionfuncs` is a Python library providing a collection of functions realizing common computer vision functionality, based on OpenCV and NumPy. 
 
 ## Dependencies
 
  * OpenCV
  * NumPy
- * EPypes
+ * SciPy
+ * Pandas
 
 ## Similar and related libraries
 
