@@ -32,6 +32,6 @@ def downsample_by_interpolate(s, n):
     f = interpolate.interp1d(domain, s)
 
     step = sig_len / n
-    x = np.arange(0, sig_len, step)
+    x = np.arange(0, sig_len - 1, step)
     
     return f(x)
