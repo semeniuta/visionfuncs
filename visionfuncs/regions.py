@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import pandas as pd
 import math
+from skimage.filters import threshold_otsu
+from .edges import sobel_magnitude_from_image
+from .improc import scale_image_255
 
 
 def threshold_binary_inv(im, t):
@@ -175,3 +178,31 @@ def region_ellipse_from_moments(im_binary):
         theta += math.pi/2
         
     return center_x, center_y, d1, d2, theta
+
+
+def detect_major_object_region(im, object_is_dark=True):
+    """
+    Detect one major object in an image, which
+    sticks out compared to its backgound.
+
+    The function combines basic thresholding 
+    with thresholded Sobel magnitude, 
+    filling holes based on conrours, and 
+    returning the largest connected component. 
+    """
+
+    threshold_func = threshold_binary_inv if object_is_dark else threshold_binary
+    otsu_t = threshold_otsu(im)
+    im_t = threshold_func(im, otsu_t)
+
+    im_sm = scale_image_255(sobel_magnitude_from_image(im))
+    sm_t = threshold_otsu(im_sm)
+    im_sm_t = threshold_binary(im_sm, sm_t)
+
+    im_t_good = np.bitwise_or(im_t, im_sm_t)
+    im_t_better = fill_holes_based_on_contours(im_t_good)
+
+    labels, stats_df = find_ccomp(im_t_better)
+    largest_ccomp_idx = stats_df.area.sort_values(ascending=False).index[1]
+
+    return scale_image_255(labels == largest_ccomp_idx)
