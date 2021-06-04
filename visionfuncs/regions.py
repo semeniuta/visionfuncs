@@ -50,6 +50,18 @@ def mask_threshold_range(im, thresh_min, thresh_max):
     return np.uint8(binary_output)
 
 
+def circular_mask(im_wh, x, y, radius):
+    """
+    Create circular mask given image shape, 
+    center (x, y) and radius of the circle
+    """
+
+    mask = np.zeros(im_wh, dtype="uint8")
+    cv2.circle(mask, (x, y), radius, 255, -1)
+
+    return mask
+    
+
 def bitwise_or(images):
     """
     Apply bitwise OR operation to a list of images
