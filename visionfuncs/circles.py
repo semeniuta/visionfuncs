@@ -1,6 +1,6 @@
 import cv2
 
-def hough_circles(image, dp, min_dist):
+def hough_circles(image, dp, min_dist, **other_kwargs):
     """
     Detect circles using Hough transform. 
     Returns a (n x 3) array, where every row
@@ -12,7 +12,7 @@ def hough_circles(image, dp, min_dist):
     min_dist - minimum distance between the centers of the detected circles.
     """
 
-    hc_res = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, dp, min_dist)
+    hc_res = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, dp, min_dist, **other_kwargs)
 
     if hc_res is None:
         return None
