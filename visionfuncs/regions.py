@@ -27,6 +27,21 @@ def threshold_binary(im, t):
     return im_t
 
 
+def threshold_masked_region(im, mask, threshold_func, *args, **kwargs):
+    """
+    Apply thresholding operating only to the pixels
+    within the masked region.
+
+    The concrete thresholding function is supplied via the
+    threshold_func argument. Additional arguments 
+    to threshold_func can be supplied via *args and **kwargs
+    """    
+
+    im_t = threshold_func(im, *args, **kwargs)
+
+    return apply_mask(im_t, mask)
+
+
 def apply_mask(im, mask):
 
     return cv2.bitwise_and(im, im, mask=mask)
