@@ -77,13 +77,16 @@ def erode(im, kernel_size, n_iter=1):
     return cv2.erode(im, kernel, iterations=n_iter)
 
 
-def image_histogram(im, n_bins=32, as_float=False):
+def image_histogram(im, n_bins=32, range=None, as_float=False):
     """
     Compute image histogram and return 
     the per-bin counts as an 1D array
     """
 
-    counts, _ = np.histogram(im, bins=n_bins, range=(0, 256))
+    if range is None:
+        range = (0, 256)
+
+    counts, _ = np.histogram(im, bins=n_bins, range=range)
     
     if as_float:
         return np.array(counts, dtype=np.float64)
