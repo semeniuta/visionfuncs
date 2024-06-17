@@ -199,11 +199,8 @@ def region_ellipse_from_moments(im_binary):
     d1 = 2 * np.sqrt(2 * (mu20 + mu02 + s))
     d2 = 2 * np.sqrt(2 * (mu20 + mu02 - s))
     
-    theta = 0.5 * math.atan(2 * mu11 / (mu20 - mu02))
-    
-    if mu20 < mu02:
-        theta += math.pi/2
-        
+    theta = 0.5 * math.atan2(2 * mu11, (mu20 - mu02))
+
     return center_x, center_y, d1, d2, theta
 
 
