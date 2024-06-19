@@ -230,3 +230,7 @@ def detect_major_object_region(im, object_is_dark=True):
     largest_ccomp_idx = stats_df.area.sort_values(ascending=False).index[1]
 
     return scale_image_255(labels == largest_ccomp_idx)
+
+
+def get_single_label_image(labels, val):
+    return np.array(labels==val, dtype=np.uint8)
