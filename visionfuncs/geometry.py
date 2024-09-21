@@ -70,6 +70,15 @@ def rvec_to_angle_axis(rvec):
     return theta, rvec_unit
 
 
+def rvec_tvec_to_homegenous_transform(rvec, tvec):
+
+    T = np.eye(4)
+    T[:3, :3] = rvec_to_rmat(np.ravel(rvec))
+    T[:3, 3] = np.ravel(tvec)
+
+    return T
+
+
 def triangulate_points(P1, P2, points1, points2):
     """
     Triangulate 3D coordinates of points
