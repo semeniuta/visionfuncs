@@ -148,3 +148,16 @@ def fit_line_2d(points):
     a, b = np.polyfit(x, y, deg=1)
     
     return np.array([a, -1, b])
+
+
+def transform_points(transform, points):
+
+    n_points, dim = points.shape
+
+    x = np.ones((dim + 1, n_points))
+    x[:dim, :] = points.T
+
+    transformed = transform @ x
+    normalized = transformed[:dim, :] / transformed[-1, :]
+
+    return np.array(normalized.T, dtype=np.float32)
