@@ -161,3 +161,9 @@ def transform_points(transform, points):
     normalized = transformed[:dim, :] / transformed[-1, :]
 
     return np.array(normalized.T, dtype=np.float32)
+
+
+def project_points(pattern_points, cm, dc, rvecs, tvecs):
+
+    projected, _ = cv2.projectPoints(pattern_points, rvecs, tvecs, cm, dc)
+    return projected.reshape(len(projected), 2)
