@@ -6,28 +6,41 @@ from matplotlib import pyplot as plt
 
 from visionfuncs.warp import warp
 
-if __name__ == '__main__':
 
-    im = np.ones((300, 400, 3), dtype=np.uint8) * 255
-    im[10:290, 10:390] = (0, 0, 255)
+def create_base_image(w, h, rim, backgroud_color=(0, 0, 255), top=50, left=100):
+
+    im = np.ones((h, w, 3), dtype=np.uint8) * 255
+    im[rim:h-rim, rim:w-rim] = backgroud_color
     cb = skimage.data.checkerboard()
-    w, h = cb.shape
-    top = 50
-    left = 100
+    cb_w, cb_h = cb.shape
 
     for channel in range(3):
-        im[top:top+w, left:left+h, channel] = cb
+        im[top:top+cb_w, left:left+cb_h, channel] = cb
+
+    return im
+
+
+if __name__ == '__main__':
+
+    w = 400
+    h = 300
+    rim = 10
+
+    im = create_base_image(w, h, rim)
+
+    last_x_before_rim = w - rim - 1
+    last_y_before_rim = h - rim - 1
 
     src = np.array([
-        [10, 10], [289, 10], [389, 289], [10, 289]
+        [rim, rim], [last_x_before_rim, rim], [last_x_before_rim, last_y_before_rim], [rim, last_y_before_rim]
     ], dtype=np.float32)
 
     dst = np.array([
-        [10+30, 10], [289-30, 10], [389, 289], [10, 289]
+        [rim+30, rim], [last_x_before_rim-30, rim], [last_x_before_rim, last_y_before_rim], [rim, last_y_before_rim]
     ], dtype=np.float32)
 
     M = cv2.getPerspectiveTransform(src, dst)
-    im_warped = warp(im, M, (400, 300))
+    im_warped = warp(im, M, (w, h))
 
     _, (ax_original, ax_warped) = plt.subplots(1, 2)
     ax_original.imshow(im, interpolation='none')
